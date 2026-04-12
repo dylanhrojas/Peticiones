@@ -1,0 +1,219 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.25rem;
+  padding: 1.5rem 2.5rem;
+  background: transparent;
+  border: none;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
+.brand:hover { opacity: 0.85; }
+
+.brandLogo {
+  height: 58px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 2px 14px rgba(212, 164, 84, 0.28));
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+/* LINKS */
+.links {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 0.95rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+  border-radius: var(--radius-full);
+  transition: color 0.25s ease;
+}
+
+.navLink:hover {
+  color: var(--gold);
+}
+
+.navLinkActive {
+  color: var(--gold);
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.95rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+}
+
+.ghostBtn:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* USER AVATAR + DROPDOWN */
+.userMenu {
+  position: relative;
+}
+
+.avatarBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212, 164, 84, 0.18), rgba(240, 212, 138, 0.08));
+  border: 1px solid rgba(212, 164, 84, 0.35);
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.avatarBtn:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 164, 84, 0.15);
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarInitials {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  min-width: 220px;
+  background: rgba(10, 16, 30, 0.85);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.5rem;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: dropdownIn 0.2s ease-out;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownHeader {
+  padding: 0.75rem 0.85rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.dropdownName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.dropdownEmail {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.01em;
+}
+
+.dropdownDivider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: 0.25rem 0;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-muted) !important;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dropdownItem svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text) !important;
+}
+
+.dropdownItem:hover svg {
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  .nav {
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+  }
+  .brandLogo { height: 44px; }
+  .navLink { padding: 0 0.55rem; font-size: 0.65rem; }
+}
