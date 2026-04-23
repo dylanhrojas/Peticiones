@@ -4,7 +4,8 @@ nixPkgs = ["nodejs", "maven", "jdk21"]
 [phases.build]
 cmds = [
   "cd frontend && npm install && npm run build && cd ..",
-  "ls -la src/main/resources/static/",
+  "ls -la src/main/resources/static/ || echo 'Static dir not found'",
+  "mvn -version",
   "mvn clean package -DskipTests",
   "chmod +x railway-config.sh"
 ]
