@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "maven", "jdk21"]
+
+[phases.build]
+cmds = [
+  "cd frontend && npm ci && npm run build",
+  "mvn clean package -DskipTests",
+  "chmod +x railway-config.sh"
+]
+
+[start]
+cmd = "./railway-config.sh"
