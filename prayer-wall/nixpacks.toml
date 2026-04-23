@@ -3,7 +3,8 @@ nixPkgs = ["nodejs", "maven", "jdk21"]
 
 [phases.build]
 cmds = [
-  "cd frontend && npm install && npm run build",
+  "cd frontend && npm install && npm run build && cd ..",
+  "ls -la src/main/resources/static/",
   "mvn clean package -DskipTests",
   "chmod +x railway-config.sh"
 ]
