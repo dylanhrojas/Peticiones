@@ -9,6 +9,8 @@ const CATEGORY_COLORS = {
   OTROS:      '#A8A8B3',
 }
 
+const MISSIONARY_COLOR = '#2A9D8F'
+
 // Rounding precision ≈ 0.1° ≈ 11km per cell — keeps nearby prayers
 // under a single bar so they never z-fight on the globe.
 const CELL_PRECISION = 1
@@ -18,7 +20,7 @@ function cellKey(lat, lng) {
   return `${Math.round(lat * f) / f},${Math.round(lng * f) / f}`
 }
 
-export default function PrayerGlobe({ requests, onSelect }) {
+export default function PrayerGlobe({ requests, missionaries, mode, onSelect }) {
   const globeRef = useRef()
   const [size, setSize] = useState({ w: window.innerWidth, h: window.innerHeight })
 
@@ -38,7 +40,7 @@ export default function PrayerGlobe({ requests, onSelect }) {
 
   // Group prayers that share a cell into a single bar. Altitude stacks the
   // prayer counts; color picks the dominant category in the cell.
-  const points = useMemo(() => {
+  const prayerPoints = useMemo(() => {
     const groups = new Map()
     for (const r of requests) {
       if (r.latitude == null || r.longitude == null) continue
@@ -77,9 +79,34 @@ export default function PrayerGlobe({ requests, onSelect }) {
         color: CATEGORY_COLORS[dominant] ?? CATEGORY_COLORS.OTROS,
         label,
         data: group,
+        type: 'prayers'
       }
     })
   }, [requests])
+
+  // Missionary points - shows markers for missionary countries
+  const missionaryPoints = useMemo(() => {
+    if (!missionaries) return []
+
+    return missionaries.map(stat => {
+      const label = stat.count === 1
+        ? `${stat.missionaries[0].name} · Misionero en ${stat.country}`
+        : `${stat.count} misioneros en ${stat.country}`
+
+      return {
+        lat: stat.lat || 0,
+        lng: stat.lng || 0,
+        altitude: 0.3,
+        radius: Math.max(0.5, stat.count * 0.15),
+        color: MISSIONARY_COLOR,
+        label,
+        data: stat.missionaries,
+        type: 'missionaries'
+      }
+    })
+  }, [missionaries])
+
+  const points = mode === 'missionaries' ? missionaryPoints : prayerPoints
 
   return (
     <Globe

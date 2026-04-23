@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/prayer-requests/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/testimonies/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/stats").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/user/missionaries").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/prayer-requests/*/pray").permitAll()
                 // Static files (React) + SPA routes
                 .requestMatchers("/", "/index.html", "/assets/**").permitAll()

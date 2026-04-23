@@ -29,8 +29,9 @@ Una plataforma donde cualquier persona puede publicar una petición de oración 
 ## MVP — Lo que SÍ va en la primera versión
 
 ### Autenticación
-- Registro/login con correo + contraseña, **o** Google OAuth (elegir solo una vía para no complicarse)
-- Perfil básico: nombre, país, foto opcional
+- ~~Registro/login con correo + contraseña~~, **y** Google OAuth ✅
+- Perfil básico: nombre, país, foto opcional ✅
+- **Misioneros:** opción en registro y perfil para marcar al usuario como misionero, con país de servicio y bio ✅
 
 ### Publicar peticiones
 - Formulario con:
@@ -84,6 +85,8 @@ Una plataforma donde cualquier persona puede publicar una petición de oración 
 - Compartir petición con link único
 - Versículo del día en el home
 - Hexbins / agrupación regional cuando hay mucha actividad para evitar saturación visual
+- ~~Visualización de misioneros en el globo 3D~~ ✅
+- ~~Directorio/mapa de misioneros por país~~ ✅
 
 ---
 
@@ -208,7 +211,10 @@ El proyecto técnicamente es serio (3D, full-stack, base de datos, autenticació
 - **Mis peticiones:** página privada para gestionar peticiones propias, marcar como respondida y escribir testimonio
 - **Testimonios:** galería con cards, icono de oraciones, counter dorado
 - **Contadores globales:** oraciones hoy, peticiones publicadas, respondidas — visibles en el hero del landing y sobre el globo
-- **Editar perfil:** página /perfil para cambiar nombre y país
+- **Editar perfil:** página /perfil para cambiar nombre, país, status de misionero, país misionero y bio/testimonio
+- **Sistema de misioneros:** checkbox en registro y perfil para marcar usuarios como misioneros, campo para país de servicio
+- **API de misioneros:** endpoint GET /api/user/missionaries con estadísticas por país y lista de misioneros
+- **Visualización de misioneros en el globo:** barra dorada especial en el 3D globe para países con misioneros activos, con modal de detalle
 - **Archivado automático:** cron job diario que archiva peticiones sin actividad por 30 días
 - **SPA routing:** forwarding de rutas del frontend en Spring Boot
 - **Loading states:** loader animado en todas las páginas que cargan datos
@@ -236,3 +242,8 @@ El proyecto técnicamente es serio (3D, full-stack, base de datos, autenticació
 - [ ] **Skeleton loaders** — reemplazar los dots por skeletons que imiten la forma del contenido
 - [ ] **Responsive polish** — revisar breakpoints en tablets y móviles pequeños
 - [ ] **PWA** — service worker para funcionar offline y "Add to Home Screen"
+- [x] **Página de misioneros** — sección dedicada para visualizar misioneros por país en el home ✅
+- [x] **Bio en perfil** — campo de texto largo para testimonio o descripción espiritual ✅
+- [ ] **Sistema de moderación** — panel admin para revisar/ocultar peticiones y comentarios inapropiados
+- [ ] **Filtro anti-spam automático** — detección de palabras ofensivas, URLs sospechosas, contenido repetitivo
+- [ ] **Reportar contenido** — botón para que usuarios reporten peticiones o comentarios inapropiados

@@ -38,10 +38,12 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCountry(request.getCountry());
+        user.setIsMissionary(request.getIsMissionary() != null ? request.getIsMissionary() : false);
+        user.setMissionaryCountry(request.getMissionaryCountry());
         user = userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getId(), user.getEmail());
-        return new AuthResponse(user.getId(), token, user.getName(), user.getEmail(), user.getCountry(), user.getPhotoUrl());
+        return new AuthResponse(user.getId(), token, user.getName(), user.getEmail(), user.getCountry(), user.getPhotoUrl(), user.getIsMissionary(), user.getMissionaryCountry(), user.getBio());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -53,7 +55,7 @@ public class AuthService {
         }
 
         String token = jwtUtil.generateToken(user.getId(), user.getEmail());
-        return new AuthResponse(user.getId(), token, user.getName(), user.getEmail(), user.getCountry(), user.getPhotoUrl());
+        return new AuthResponse(user.getId(), token, user.getName(), user.getEmail(), user.getCountry(), user.getPhotoUrl(), user.getIsMissionary(), user.getMissionaryCountry(), user.getBio());
     }
 
     public AuthResponse googleAuth(String idTokenString) {
@@ -89,7 +91,7 @@ public class AuthService {
             }
 
             String token = jwtUtil.generateToken(user.getId(), user.getEmail());
-            return new AuthResponse(user.getId(), token, user.getName(), user.getEmail(), user.getCountry(), user.getPhotoUrl());
+            return new AuthResponse(user.getId(), token, user.getName(), user.getEmail(), user.getCountry(), user.getPhotoUrl(), user.getIsMissionary(), user.getMissionaryCountry(), user.getBio());
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

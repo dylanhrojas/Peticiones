@@ -181,3 +181,43 @@
   font-size: 0.8rem;
   text-align: center;
 }
+
+/* Checkbox */
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  margin-top: 0.5rem;
+  align-self: flex-start;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--gold);
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.3s ease, background 0.3s ease;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.textarea:focus {
+  border-color: rgba(212, 164, 84, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+}

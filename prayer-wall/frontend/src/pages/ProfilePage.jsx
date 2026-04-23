@@ -11,6 +11,9 @@ export default function ProfilePage() {
 
   const [name, setName] = useState(user?.name || '')
   const [country, setCountry] = useState(user?.country || '')
+  const [isMissionary, setIsMissionary] = useState(user?.isMissionary || false)
+  const [missionaryCountry, setMissionaryCountry] = useState(user?.missionaryCountry || '')
+  const [bio, setBio] = useState(user?.bio || '')
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
@@ -19,6 +22,11 @@ export default function ProfilePage() {
   const [countryOpen, setCountryOpen] = useState(false)
   const [countryIdx, setCountryIdx] = useState(0)
   const countryMatches = searchCountries(country)
+
+  // Missionary country autocomplete
+  const [missionaryCountryOpen, setMissionaryCountryOpen] = useState(false)
+  const [missionaryCountryIdx, setMissionaryCountryIdx] = useState(0)
+  const missionaryCountryMatches = searchCountries(missionaryCountry)
 
   if (!user) {
     navigate('/login', { replace: true })
@@ -40,7 +48,13 @@ export default function ProfilePage() {
       const res = await fetch('/api/user/me', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...authHeaders() },
-        body: JSON.stringify({ name: name.trim(), country: country.trim() }),
+        body: JSON.stringify({
+          name: name.trim(),
+          country: country.trim(),
+          isMissionary,
+          missionaryCountry: isMissionary ? missionaryCountry.trim() : null,
+          bio: bio.trim()
+        }),
       })
       if (!res.ok) throw new Error('Error al guardar')
       const data = await res.json()
@@ -71,7 +85,25 @@ export default function ProfilePage() {
     }
   }
 
+  function handleMissionaryCountryKeyDown(e) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setMissionaryCountryOpen(true)
+      setMissionaryCountryIdx(i => Math.min(i + 1, missionaryCountryMatches.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setMissionaryCountryIdx(i => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter' && missionaryCountryOpen && missionaryCountryMatches.length > 0) {
+      e.preventDefault()
+      setMissionaryCountry(missionaryCountryMatches[missionaryCountryIdx]?.name || '')
+      setMissionaryCountryOpen(false)
+    } else if (e.key === 'Escape') {
+      setMissionaryCountryOpen(false)
+    }
+  }
+
   const flag = flagForName(country)
+  const missionaryFlag = flagForName(missionaryCountry)
 
   return (
     <div className={styles.page}>
@@ -140,6 +172,62 @@ export default function ProfilePage() {
             </ul>
           )}
         </div>
+
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={isMissionary}
+            onChange={(e) => setIsMissionary(e.target.checked)}
+            className={styles.checkbox}
+          />
+          <span>Soy misionero</span>
+        </label>
+
+        {isMissionary && (
+          <>
+            <label className={styles.label}>País donde sirves como misionero</label>
+            <div className={styles.countryWrap}>
+              {missionaryFlag && <span className={styles.countryFlag}>{missionaryFlag}</span>}
+              <input
+                className={styles.input}
+                type="text"
+                value={missionaryCountry}
+                onChange={e => {
+                  setMissionaryCountry(e.target.value)
+                  setMissionaryCountryOpen(true)
+                  setMissionaryCountryIdx(0)
+                }}
+                onFocus={() => { if (missionaryCountry.trim()) setMissionaryCountryOpen(true) }}
+                onKeyDown={handleMissionaryCountryKeyDown}
+                onBlur={() => setTimeout(() => setMissionaryCountryOpen(false), 150)}
+                autoComplete="off"
+              />
+              {missionaryCountryOpen && missionaryCountryMatches.length > 0 && (
+                <ul className={styles.countryList}>
+                  {missionaryCountryMatches.map((c, i) => (
+                    <li
+                      key={c.code}
+                      className={`${styles.countryItem} ${i === missionaryCountryIdx ? styles.countryItemActive : ''}`}
+                      onMouseDown={(e) => { e.preventDefault(); setMissionaryCountry(c.name); setMissionaryCountryOpen(false) }}
+                      onMouseEnter={() => setMissionaryCountryIdx(i)}
+                    >
+                      {c.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        )}
+
+        <label className={styles.label}>Bio / Testimonio</label>
+        <textarea
+          className={styles.textarea}
+          value={bio}
+          onChange={e => setBio(e.target.value)}
+          placeholder="Comparte tu testimonio o descripción de tu espiritualidad..."
+          rows={5}
+        />
 
         <button className={styles.btn} type="submit" disabled={saving}>
           {saving ? 'Guardando...' : 'Guardar cambios'}

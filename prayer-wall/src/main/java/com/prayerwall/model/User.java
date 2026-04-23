@@ -29,6 +29,14 @@ public class User {
 
     private String photoUrl;
 
+    @Column(nullable = false)
+    private Boolean isMissionary = false;
+
+    private String missionaryCountry;
+
+    @Column(length = 1000)
+    private String bio;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AuthProvider provider = AuthProvider.LOCAL;

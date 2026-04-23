@@ -5,7 +5,7 @@ import PrayerCard from '../components/PrayerCard'
 import TrendingSidebar from '../components/TrendingSidebar'
 import Loader from '../components/Loader'
 import { useAuth, authHeaders } from '../hooks/useAuth'
-import { searchCountries, normalizeCountry, flagEmoji, flagForName } from '../data/countries'
+import { searchCountries, normalizeCountry, flagEmoji, flagForName, coordsForName } from '../data/countries'
 import styles from './HomePage.module.css'
 
 const CATEGORIES = [
@@ -34,14 +34,16 @@ const DAY = 86_400_000
 export default function HomePage() {
   const { user } = useAuth()
   const [requests, setRequests] = useState([])
+  const [missionaries, setMissionaries] = useState([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [stats, setStats] = useState({ prayersToday: 0, totalAnswered: 0 })
-  // Always an array of prayer requests (1 for single click, N for a cell group).
+  // Always an array of prayer requests (1 for single click, N for a cell group) or missionaries.
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [view, setView] = useState('globe')
+  const [globeMode, setGlobeMode] = useState('prayers') // 'prayers' or 'missionaries'
   const PAGE_SIZE = 20
 
   // ─── Filter state ───────────────────────────────────────────────
@@ -73,6 +75,16 @@ export default function HomePage() {
       })
       .catch(() => setLoading(false))
     fetch('/api/stats').then(r => r.json()).then(setStats)
+    fetch('/api/user/missionaries')
+      .then(r => r.json())
+      .then(data => {
+        const withCoords = data.map(stat => ({
+          ...stat,
+          ...(coordsForName(stat.country) || { lat: 0, lng: 0 })
+        }))
+        setMissionaries(withCoords)
+      })
+      .catch(err => console.error('Error loading missionaries:', err))
   }, [])
 
   // Close country dropdown / legend popover on outside click
@@ -208,16 +220,37 @@ export default function HomePage() {
   }
 
   const filterCountryFlag = flagForName(filterCountry)
-  const location = selectedGroup?.[0]?.country
+  const isMissionaryModal = selectedGroup && selectedGroup[0] && 'missionaryCountry' in selectedGroup[0]
+  const location = isMissionaryModal ? selectedGroup[0]?.missionaryCountry : selectedGroup?.[0]?.country
   const multi = selectedGroup && selectedGroup.length > 1
 
   return (
     <div className={styles.page}>
       {loading && <Loader text="Cargando peticiones" />}
-      {!loading && view === 'globe' && <PrayerGlobe requests={requests} onSelect={handleGlobeSelect} />}
+      {!loading && view === 'globe' && <PrayerGlobe requests={requests} missionaries={missionaries} mode={globeMode} onSelect={handleGlobeSelect} />}
+
+      {/* Globe mode toggle - prayers vs missionaries */}
+      {!loading && view === 'globe' && (
+        <div className={styles.globeModeToggle}>
+          <button
+            type="button"
+            className={globeMode === 'prayers' ? styles.globeModeActive : styles.globeModeBtn}
+            onClick={() => setGlobeMode('prayers')}
+          >
+            Peticiones
+          </button>
+          <button
+            type="button"
+            className={globeMode === 'missionaries' ? styles.globeModeActive : styles.globeModeBtn}
+            onClick={() => setGlobeMode('missionaries')}
+          >
+            Misioneros
+          </button>
+        </div>
+      )}
 
       {/* Globe legend — floating (i) button + popover with category colors */}
-      {!loading && view === 'globe' && (
+      {!loading && view === 'globe' && globeMode === 'prayers' && (
         <div className={styles.legendWrap} ref={legendRef}>
           <button
             type="button"
@@ -534,20 +567,53 @@ export default function HomePage() {
 
               <header className={styles.modalHeader}>
                 <span className={styles.modalKicker}>
-                  {multi ? 'Peticiones desde' : 'Petición desde'}
+                  {isMissionaryModal
+                    ? (multi ? 'Misioneros en' : 'Misionero en')
+                    : (multi ? 'Peticiones desde' : 'Petición desde')
+                  }
                 </span>
                 <h2 className={styles.modalLocation}>{location || 'Este lugar'}</h2>
-                {multi && (
+                {multi && !isMissionaryModal && (
                   <span className={styles.modalCount}>
                     {selectedGroup.length} voces orando juntas
+                  </span>
+                )}
+                {multi && isMissionaryModal && (
+                  <span className={styles.modalCount}>
+                    {selectedGroup.length} misioneros sirviendo
                   </span>
                 )}
               </header>
 
               <div className={styles.modalFeed}>
-                {selectedGroup.map((r, i) => (
-                  <PrayerCard key={r.id} request={r} onPray={handlePray} index={i} isOwner={!!user && r.authorId === user.userId} />
-                ))}
+                {isMissionaryModal ? (
+                  selectedGroup.map((m, i) => (
+                    <div key={m.id} className={styles.missionaryCard}>
+                      {m.photoUrl ? (
+                        <img src={m.photoUrl} alt={m.name} className={styles.missionaryPhoto} />
+                      ) : (
+                        <div className={styles.missionaryPhotoFallback}>
+                          <span>{m.name.slice(0, 2).toUpperCase()}</span>
+                        </div>
+                      )}
+                      <div className={styles.missionaryInfo}>
+                        <h3 className={styles.missionaryName}>{m.name}</h3>
+                        <p className={styles.missionaryCountry}>
+                          Sirviendo en {m.missionaryCountry}
+                          {m.country && ` • De ${m.country}`}
+                        </p>
+                        {m.bio && <p className={styles.missionaryBio}>{m.bio}</p>}
+                        <a href={`mailto:${m.email}`} className={styles.missionaryContact}>
+                          Contactar
+                        </a>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  selectedGroup.map((r, i) => (
+                    <PrayerCard key={r.id} request={r} onPray={handlePray} index={i} isOwner={!!user && r.authorId === user.userId} />
+                  ))
+                )}
               </div>
             </motion.div>
           </motion.div>
